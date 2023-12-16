@@ -12,11 +12,12 @@ namespace Trivia_Stage1.UI
     public class TriviaScreensImp:ITriviaScreens
     {
         private TriviaDbContext context = new TriviaDbContext();
-        //Place here any state you would like to keep during the app life time
-        //For example, player login details...
+        public Player loggedPlayer {get; private set;}
+    //Place here any state you would like to keep during the app life time
+    //For example, player login details...
 
 
-        private DbContext db = new TriviaDbContext();
+    private DbContext db = new TriviaDbContext();
 
         //Implememnt interface here
         public bool ShowLogin()
@@ -30,45 +31,53 @@ namespace Trivia_Stage1.UI
             //Logout user if anyone is logged in!
             //A reference to the logged in user should be stored as a member variable
             //in this class! Example:
-            //this.currentyPLayer == null
+
 
             //Loop through inputs until a user/player is created or 
             //user choose to go back to menu
             char c = ' ';
-            while (c != 'B' && c != 'b' /*&& this.currentyPLayer == null*/)
+            while (c != 'B' && c != 'b' && loggedPlayer == null)
             {
                 //Clear screen
                 ClearScreenAndSetTitle("Signup");
 
                 Console.Write("Please Type your email: ");
                 string email = Console.ReadLine();
+
                 while (!IsEmailValid(email))
                 {
+                    if (email == "b" || email == "B") { return false; }
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("Bad Email Format! Please try again:");
                     Console.ResetColor();
                     email = Console.ReadLine();
+
                 }
+                loggedPlayer.Mail = email;
 
                 Console.Write("Please Type your password: ");
                 string password = Console.ReadLine();
                 while (!IsPasswordValid(password))
                 {
-                    Console.ForegroundColor= ConsoleColor.Red;  
+                    if (password == "b" || password == "B") { return false; }
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("password must be at least 4 characters! Please try again: ");
-                    Console.ResetColor();   
+                    Console.ResetColor();
                     password = Console.ReadLine();
                 }
+                loggedPlayer.Password = password;
 
                 Console.Write("Please Type your Name: ");
                 string name = Console.ReadLine();
                 while (!IsNameValid(name))
                 {
+                    if (name == "b" || name == "B") { return false; }
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("name must be at least 3 characters! Please try again: ");
                     Console.ResetColor();
                     name = Console.ReadLine();
                 }
+                loggedPlayer.Name = name;
 
                 Console.ForegroundColor = ConsoleColor.DarkBlue;
                 Console.WriteLine("Connecting to Server...");
@@ -86,6 +95,18 @@ namespace Trivia_Stage1.UI
                 //    Console.WriteLine("Failed to signup! Email may already exist in DB!");
                 //    Console.ResetColor();
                 //}
+                try
+                {
+                    context.Players.Add(loggedPlayer);
+                    context.SaveChanges();
+
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Sign Up failed");
+                    Console.ResetColor();
+                }
 
 
 
@@ -95,36 +116,62 @@ namespace Trivia_Stage1.UI
                 c = Console.ReadKey(true).KeyChar;
             }
             //return true if signup suceeded!
-            return (false);
+            return true;
+
         }
         //Ben
         public void ShowAddQuestion()
         {//פעולה הבודקת האם יש למשתמש מספיק נקודות כדי להוסיף שאלה ומבקשת ממנו להוסיף שאלה
-
-            Console.WriteLine("Question");
-            foreach(Player p in context.Players)
+            if (loggedPlayer.Points == 100)
             {
-
-                if (p.Points >= 100)
+                Console.WriteLine("Add the questions text press b to go back");
+                string qText= Console.ReadLine();
+                Question q = new Question();
+                if (qText.ToUpper() == "B")
+                    return;
+                q.Text = qText;
+                Console.WriteLine("Choose a subject 1 - Sports, 2 - Poiltics, 3 - History, 4 - Science ,5 -Ramon:");
+                char y = '0';
+                while (y == 0)
                 {
-                    Console.WriteLine("Horray you reached 100 points now you can add a question");
-                    Console.WriteLine("Write the subject");
-                    string subject=Console.ReadLine();
-                    Console.WriteLine("Write the question");
-                    string question=Console.ReadLine();
-                    Console.WriteLine("Write the correct answer");
-                    string correctanswer=Console.ReadLine();
-                    Console.WriteLine("Write the first wrong answer");
-                    string WrongAnswer1 = Console.ReadLine();
-                    Console.WriteLine("write the second wrong answer");
-                    string WrongAnswer2 = Console.ReadLine();
-                    Console.WriteLine("write the third wrong answer");
-                    string WrongAnswer3 = Console.ReadLine();
-
+                    y= Console.ReadKey().KeyChar;
+                    if (y == '1')
+                        q.StatusId = 1;
+                    else if (y == '2')
+                        q.StatusId = 2;
+                    else if (y == '3')
+                        q.StatusId = 3;
+                    else if (y == '4')
+                        q.StatusId = 4;
+                    else if (y == '5')
+                        q.StatusId = 5;
+                    else y = '0';
 
                 }
-                else { Console.WriteLine("if you want to add questions,you need to get more points!"); }
+                Console.WriteLine();
+                string x;
+                Console.WriteLine("Add the right answer:");
+                x=Console.ReadLine();
+                q.RightA = x;
+                Console.WriteLine("Add worng answer 1");
+                q.WrongA1 = x;
+                Console.WriteLine("Add wrong answer 2");
+                q.WrongA2 = x;
+                Console.WriteLine("Add wrong answer 3");
+                q.WrongA3 = x;
+                q.StatusId = 2;
+                q.PlayerId = loggedPlayer.PlayerId;
+                context.Questions.Add(q);
+                context.SaveChanges();
+                loggedPlayer.Points = 0;
+                loggedPlayer.Questionsadded++;
             }
+            else
+            {
+                Console.Clear();
+
+            }
+        
         }
 
         public void ShowPendingQuestions()//Ben
@@ -167,9 +214,99 @@ namespace Trivia_Stage1.UI
             Console.ReadKey(true);
         }
         public void ShowProfile()
-        { 
-            Console.WriteLine("Not implemented yet! Press any key to continue...");
-            Console.ReadKey(true);
+        {
+
+            char c = ' ';
+            while (c != 'B' && c != 'b')
+            {
+                Console.WriteLine($"Email:{loggedPlayer.Mail}");
+                Console.WriteLine($"Name:{loggedPlayer.Name}");
+                Console.WriteLine($"Password:{loggedPlayer.Password}");
+                Console.WriteLine($"Rank:{loggedPlayer.RankId}");
+                Console.WriteLine($"Score:{loggedPlayer.Points}");
+                Console.WriteLine("   ");
+
+                char ch;
+                Console.WriteLine("if you want to update anything enter U");
+                Console.WriteLine("if you dont want to change anything enter N");
+                ch = char.Parse(Console.ReadLine());
+                bool playerUpdate = false;
+                if (ch == 'U' || ch == 'u')
+                {
+                    int num;
+                    Console.WriteLine("Enter 1 if you want to change Email");
+                    Console.WriteLine("Enter 2 if you want to change name");
+                    Console.WriteLine("Enter 3 if you wanr to change password");
+                    num = int.Parse(Console.ReadLine());
+                    while (num != 1 && num != 2 && num != 3)
+                    {
+
+                        Console.WriteLine("Enter 1 if you want to change Email");
+                        Console.WriteLine("Enter 2 if you want to change name");
+                        Console.WriteLine("Enter 3 if you wanr to change password");
+                        num = int.Parse(Console.ReadLine());
+                    }
+                    if (num == 1)
+                    {
+                        string updatedEmail;
+                        Console.WriteLine("enter new Email");
+                        updatedEmail = Console.ReadLine();
+                        if (!IsEmailValid(updatedEmail))
+                        {
+                            Console.Write("Email not valid,try again");
+                            updatedEmail = Console.ReadLine();
+                        }
+                        loggedPlayer.Mail = updatedEmail;
+                        playerUpdate = true;
+                    }
+                    else if (num == 2)
+                    {
+                        string updatedName;
+                        Console.WriteLine("enter new name");
+                        updatedName = Console.ReadLine();
+                        while (!IsNameValid(updatedName))
+                        {
+                            Console.Write("name must have at least 3 letter");
+                            updatedName = Console.ReadLine();
+                        }
+                        loggedPlayer.Name = updatedName;
+                        playerUpdate = true;
+                    }
+                    else if (num == 3)
+                    {
+                        string updatedPass;
+                        Console.WriteLine("enter new Password");
+                        updatedPass = Console.ReadLine();
+                        while (!IsPasswordValid(updatedPass))
+                        {
+                            Console.Write("Password must have at least 4 letters/numbers,try again");
+                            updatedPass = Console.ReadLine();
+                        }
+                        loggedPlayer.Password = updatedPass;
+                        playerUpdate = true;
+                    }
+                    if (playerUpdate == true)
+                    {
+                        try
+                        {
+                            //TriviaDbContext db = new TriviaDbContext();
+                            //db.UpdatedPlayer(loggedPlayer);
+
+                           // context.UpdatePlayer(loggedPlayer);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("update player failed");
+                        }
+
+                    }
+                    Console.WriteLine("Press B to go back to the menu");
+                    Console.WriteLine("enter any other key to continue updating");
+                    c = Console.ReadKey(true).KeyChar;
+                }
+
+            }
+
         }
 
 
