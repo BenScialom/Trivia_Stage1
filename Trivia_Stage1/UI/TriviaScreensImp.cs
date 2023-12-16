@@ -129,7 +129,7 @@ namespace Trivia_Stage1.UI
                 Question q = new Question();
                 if (qText.ToUpper() == "B")
                     return;
-                //q.Text = qText;
+                q.Question1 = qText;
                 Console.WriteLine("Choose a subject 1 - Sports, 2 - Poiltics, 3 - History, 4 - Science ,5 -Ramon:");
                 char y = '0';
                 while (y == 0)
@@ -164,7 +164,7 @@ namespace Trivia_Stage1.UI
                 context.Questions.Add(q);
                 context.SaveChanges();
                 loggedPlayer.Points = 0;
-                //loggedPlayer.Questionsadded++;
+                //loggedPlayer.QuestionsAdd++;
             }
             else
             {
