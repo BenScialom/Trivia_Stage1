@@ -57,4 +57,19 @@ WrongA2 nvarchar(300) not null,
 WrongA3 nvarchar(300) not null
 );
 
+INSERT INTO Ranks VALUES('Admin');
+INSERT INTO [Subject] VALUES('Sport');
+INSERT INTO [Subject] VALUES('Politics');
+INSERT INTO [Subject] VALUES('History');
+INSERT INTO [Subject] VALUES('Science');
+INSERT INTO [Subject] VALUES('Ramon');
+INSERT INTO [Status] VALUES('Approved');
+INSERT INTO [Players] VALUES('m@gmail.com','TalsiHamelch','TalsiKing123',(SELECT [RankId] FROM [Ranks] WHERE [RankName]='Admin'),0);
+INSERT INTO [Questions] VALUES((SELECT [StatusId] FROM [Status] WHERE [Status]='Approved'),(SELECT [SubjectId] FROM [Subject] WHERE [SubjectName]='Sport'),(SELECT [PlayerId] FROM [Players] WHERE [Name]='TalsiHamelch'),'Who won the football champions legue last season?','Manchester City','Real Madrid','Liverpool','HapoelTLV');
+INSERT INTO [Questions] VALUES((SELECT [StatusId] FROM [Status] WHERE [Status]='Approved'),(SELECT [SubjectId] FROM [Subject] WHERE [SubjectName]='Politics'),(SELECT [PlayerId] FROM [Players] WHERE [Name]='TalsiHamelch'),'Who was the first prime minister of Israel?','David Ben Gurion','Benjemin Netanyahu','Golda Meir','Mnahem Begin');
+INSERT INTO [Questions] VALUES((SELECT [StatusId] FROM [Status] WHERE [Status]='Approved'),(SELECT [SubjectId] FROM [Subject] WHERE [SubjectName]='History'),(SELECT [PlayerId] FROM [Players] WHERE [Name]='TalsiHamelch'),'What year Israel was established?','1948','1950','1990','1939');
+INSERT INTO [Questions] VALUES((SELECT [StatusId] FROM [Status] WHERE [Status]='Approved'),(SELECT [SubjectId] FROM [Subject] WHERE [SubjectName]='Science'),(SELECT [PlayerId] FROM [Players] WHERE [Name]='TalsiHamelch'),'Who discoverd the force of gravity?','Isak Newton','Galileo','Itamar','Einstein');
+INSERT INTO [Questions] VALUES((SELECT [StatusId] FROM [Status] WHERE [Status]='Approved'),(SELECT [SubjectId] FROM [Subject] WHERE [SubjectName]='Ramon'),(SELECT [PlayerId] FROM [Players] WHERE [Name]='TalsiHamelch'),'Who is the best teacher?','Talsi','Alex','Tali','Dalia');
+
+
 

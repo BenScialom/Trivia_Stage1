@@ -76,4 +76,9 @@ public partial class TriviaDbContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+    public void UpdatePlayer(Player p)
+    {
+        Entry(p).State = EntityState.Modified;
+        SaveChanges();
+    }
 }
