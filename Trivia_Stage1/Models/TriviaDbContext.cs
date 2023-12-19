@@ -81,4 +81,20 @@ public partial class TriviaDbContext : DbContext
         Entry(p).State = EntityState.Modified;
         SaveChanges();
     }
+    public Question GetRandomQuestion()
+    {
+        Random random = new Random();
+        int questionNum = random.Next(1, Questions.Count() + 1);
+        return this.Questions.Where(i => i.QuestionId == questionNum).First();
+    }
+    public bool DoesMailExistsInDb(string mail)
+    {
+        return this.Players.Where(p => p.Mail == mail).Any();
+    }
+
+
+    public Player GetPlayerByMail(string mail)
+    {
+        return this.Players.Where(p => p.Mail == mail).First();
+    }
 }

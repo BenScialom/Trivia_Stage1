@@ -22,9 +22,57 @@ namespace Trivia_Stage1.UI
         //Implememnt interface here
         public bool ShowLogin()//Itamar
         {
-            Console.WriteLine("Not implemented yet! Press any key to continue...");
+            loggedPlayer = null;
+            bool loggedIn = false;
+            while (!loggedIn)
+            {
+                ClearScreenAndSetTitle("Login:\n");
+                string mail;
+                string password;
+                Console.WriteLine("Email:");
+                mail = Console.ReadLine();
+                while (mail == null)
+                {
+                    Console.WriteLine("Please email enter again:");
+                    mail = Console.ReadLine();
+                }
+                try
+                {
+                    if (context.DoesMailExistsInDb(mail))
+                    {
+                        Console.WriteLine("Password:");
+                        password = Console.ReadLine();
+                        while (password == null)
+                        {
+                            Console.WriteLine("Please password enter again:");
+                            password = Console.ReadLine();
+                        }
+                        loggedPlayer = context.GetPlayerByMail(mail);
+                        if (loggedPlayer != null)
+                        {
+                            if (loggedPlayer.Password == password)
+                            {
+                                Console.WriteLine("Logged in successfully!");
+                                loggedIn = true;
+                            }
+                            else
+                                Console.WriteLine("Wrong email or password. Please try again");
+                        }
+                    }
+                    else
+                        Console.WriteLine("Email doesn't exists, please try again");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Sorry, there is a problem. Press any key to return to menu-");
+                    Console.ReadKey(true);
+                    return false;
+                }
+
+            }
+            Console.WriteLine("Press any key");
             Console.ReadKey(true);
-            return true;
+            return loggedIn;
         }
         public bool ShowSignUp()//Ran
         {
@@ -210,9 +258,80 @@ namespace Trivia_Stage1.UI
         //איתמר
         public void ShowGame()
         {
-            Console.WriteLine("Not implemented yet! Press any key to continue...");
-            Console.ReadKey(true);
-        }
+            Question question;
+            List<string> answers = new List<string>(4);
+            while (true)
+            {
+
+                ClearScreenAndSetTitle("Game on");
+                try
+                {
+
+
+                    question = context.GetRandomQuestion();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Sorry, there is a problem. Press any key to return to menu-");
+                    Console.ReadKey(true);
+                    return;
+                }
+                answers.Add(question.RightA);
+                answers.Add(question.WrongA1);
+                answers.Add(question.WrongA2);
+                answers.Add(question.WrongA3);
+                answers = answers.OrderBy(x => Random.Shared.Next()).ToList();
+                Console.WriteLine($"{question.Question1}\n");
+                Console.WriteLine($"1. {answers[0]}");
+                Console.WriteLine($"2. {answers[1]}");
+                Console.WriteLine($"3. {answers[2]}");
+                Console.WriteLine($"4. {answers[3]}");
+                Console.WriteLine("Write the number of the correct answer\nYour answer:");
+                int answer = 0;
+                bool validAnswer = false;
+                while (!validAnswer)
+                {
+                    try
+                    {
+                        answer = int.Parse(Console.ReadLine());
+                        if (answer > 0 && answer < 5) { validAnswer = true; }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Invalid answer. Please try again. Press any key to continue");
+                        Console.ReadKey(true);
+                        answer = 0;
+                        continue;
+                    }
+                }
+                if (answers[answer] == question.RightA)
+                {
+                    Console.WriteLine("Correct!");
+                    loggedPlayer.Points += 10;
+                }
+                else
+                {
+                    Console.WriteLine($"Wrong answer! The answer is '{question.RightA}'");
+                    loggedPlayer.Points -= 5;
+                }
+                if (loggedPlayer.Points < 0)
+                    loggedPlayer.Points = 0;
+                if (loggedPlayer.Points > 100)
+                    loggedPlayer.Points = 100;
+                try
+                {
+                    Console.WriteLine("If you want to exist press [E]");
+                    string exit = Console.ReadLine();
+                    if (exit == "E" || exit == "e")
+                        return;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Invalid input. Press any key to exist");
+                    Console.ReadKey(true);
+                    return;
+                }
+            }
        
 
 
