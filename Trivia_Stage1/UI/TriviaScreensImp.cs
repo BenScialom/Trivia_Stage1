@@ -56,11 +56,17 @@ namespace Trivia_Stage1.UI
                                 loggedIn = true;
                             }
                             else
-                                Console.WriteLine("Wrong email or password. Please try again");
+                            {
+                                Console.WriteLine("Wrong email or password. Please try again. Press any key to continue-");
+                                Console.ReadKey(true);
+                            }
                         }
                     }
                     else
-                        Console.WriteLine("Email doesn't exists, please try again");
+                    {
+                        Console.WriteLine("Email doesn't exists, please try again. Press any key to continue-");
+                        Console.ReadKey(true);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -101,7 +107,7 @@ namespace Trivia_Stage1.UI
                     email = Console.ReadLine();
 
                 }
-                loggedPlayer.Mail = email;
+                loggedPlayer.Mail = email; 
 
                 Console.Write("Please Type your password: ");
                 string password = Console.ReadLine();
@@ -147,6 +153,8 @@ namespace Trivia_Stage1.UI
                 {
                     context.Players.Add(loggedPlayer);
                     context.SaveChanges();
+                    Console.WriteLine("sign up succeeded");
+                    
 
                 }
                 catch (Exception ex)
@@ -295,16 +303,14 @@ namespace Trivia_Stage1.UI
                     {
                         answer = int.Parse(Console.ReadLine());
                         if (answer > 0 && answer < 5) { validAnswer = true; }
+                        else Console.WriteLine("Invalid answer. Please try again");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Invalid answer. Please try again. Press any key to continue");
-                        Console.ReadKey(true);
-                        answer = 0;
-                        continue;
+                        Console.WriteLine("Invalid answer. Please try again");
                     }
                 }
-                if (answers[answer] == question.RightA)
+                if (answers[answer-1] == question.RightA)
                 {
                     Console.WriteLine("Correct!");
                     loggedPlayer.Points += 10;
@@ -320,7 +326,7 @@ namespace Trivia_Stage1.UI
                     loggedPlayer.Points = 100;
                 try
                 {
-                    Console.WriteLine("If you want to exist press [E]");
+                    Console.WriteLine("If you want to exist press [E], to continue press any other key-");
                     string exit = Console.ReadLine();
                     if (exit == "E" || exit == "e")
                         return;
@@ -332,8 +338,8 @@ namespace Trivia_Stage1.UI
                     return;
                 }
             }
-       
 
+        }
 
         //Private helper methods down here...
         private void ClearScreenAndSetTitle(string title)
