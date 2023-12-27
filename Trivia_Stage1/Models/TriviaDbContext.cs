@@ -81,6 +81,11 @@ public partial class TriviaDbContext : DbContext
         Entry(p).State = EntityState.Modified;
         SaveChanges();
     }
+    public void UpdateQuestion(Question q)
+    {
+        Entry(q).State = EntityState.Modified;
+        SaveChanges();
+    }
     public Question GetRandomQuestion()
     {
         Random random = new Random();
