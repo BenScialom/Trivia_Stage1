@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace Trivia_Stage1.UI
         //Implememnt interface here
         public bool ShowLogin()//Itamar
         {
+            
             return true;
             loggedPlayer = null;
             bool loggedIn = false;
@@ -137,7 +139,7 @@ namespace Trivia_Stage1.UI
                 try
                 {
                     context.Players.Add(loggedPlayer);
-                    context.SaveChanges();
+                    //context.SaveChanges();
                     Console.WriteLine("Sign Up succeeded");
                     signUpStatus = true;
                 }
@@ -218,90 +220,91 @@ namespace Trivia_Stage1.UI
 
         public void ShowPendingQuestions()//Ben
         {
-            char c = ' ';
-            char x = ' ';
-            char l = ' ';
-            TriviaDbContext context = new TriviaDbContext();
-            while (c != 'b' && c != 'B')
+
+
+
+            if (loggedPlayer != null && (loggedPlayer.RankId == 1 || loggedPlayer.RankId == 2))
             {
-                Console.WriteLine("Press 1 or 2");
-                Console.WriteLine("press 3");
-                Console.WriteLine("Press B");
-                c=char.Parse(Console.ReadLine());
-                if (c == '2')
+                foreach (Question q in context.Questions)
                 {
-                    if (loggedPlayer.RankId != 1 || loggedPlayer.RankId != 2)
+                    char x = '5';
+                    if (q.StatusId == 2)
                     {
-                        Console.WriteLine("Not allowed");
-                        Console.WriteLine("Press somthing");
-                        c=char.Parse(Console.ReadLine()) ;
-                    }
-                    else
-                    {
-                        List<Question> questions = context.Questions.ToList();
-                        foreach(Question q in questions)
+                        ClearScreenAndSetTitle("Pending Questions    ");
+                        Console.WriteLine($"Question: {q.Question1}");
+                        Console.WriteLine($"Correct answer {q.RightA}");
+                        Console.WriteLine($"Wrong answer #1 {q.WrongA1}");
+                        Console.WriteLine($"Wrong answer #2 {q.WrongA2}");
+                        Console.WriteLine($"Wrong answer #3 {q.WrongA3}");
+                        Console.WriteLine("Press 1 to approve press 2 to reject press 3 to skip and press 4 to exit");
+                        while (x == '5')
                         {
-                            if (q.StatusId == 2 && x != 'b' && x != 'B')
+                            x = Console.ReadKey().KeyChar;
+                            if (x == '1')
                             {
-                                Console.WriteLine($"Question:{q.Question1}");
-                                Console.WriteLine("if ok press 1,if bad 2,if eliminate 3");
-                                x = Console.ReadKey(true).KeyChar;
-                                x = char.Parse(Console.ReadLine());
-                            }
-                            if (x == 'n' || x == 'N' || x == '1')
-                            {
+                                q.StatusId = 1;
 
                             }
                             else if (x == '2')
-                            {
                                 q.StatusId = 3;
-                                try
-                                {
-                                    context.UpdateQuestion(q);
-                                    Console.WriteLine("Question eliminated");
-                                    int w = q.PlayerId;
-                                    List<Player> players = context.Players.ToList();
-                                    foreach(Player p in players)
-                                    {
-                                        if(p.PlayerId == w)
-                                        {
-                                            //need to find a way to lower the question
-                                            context.UpdatePlayer(p);
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine(ex.Message);
-                                }
+                            else if (x == '3')
+                                q.StatusId = 2;
+                            else if (x == '4')
+                            {
+                                context.SaveChanges();
                             }
-                            //else if (x == 3)
-                            //{
-                            //    while (x != 'b' && x != 'B' && x != 'n' && x != 'N')
-                            //    {
-                            //        Console.WriteLine("");
-                            //        Console.WriteLine();
-                            //        Console.WriteLine();
-                            //        x=Console.ReadKey(true).KeyChar;
-                            //        if (x == 'n' || x == 'N' || x == 'b' || x == 'B')
-                            //        {
 
-                            //        }
-                            //        else if (x == '1')
-                            //        {
-                            //            string Newq;
-                            //            Console.WriteLine("Enter new question");
-                            //            Newq= Console.ReadLine();
-                            //        }
-                            //    }
-                            //}
                         }
                     }
+
                 }
+                    context.SaveChanges();
             }
+            else
+            {
+                Console.WriteLine("Hello");
+                foreach (Question q in context.Questions)
+                {
+                    char x = '5';
+                    if (q.StatusId == 2)
+                    {
+                        ClearScreenAndSetTitle("Pending Questions    ");
+                        Console.WriteLine($"Question: {q.Question1}");
+                        Console.WriteLine($"Correct answer {q.RightA}");
+                        Console.WriteLine($"Wrong answer #1 {q.WrongA1}");
+                        Console.WriteLine($"Wrong answer #2 {q.WrongA2}");
+                        Console.WriteLine($"Wrong answer #3 {q.WrongA3}");
+                        Console.WriteLine("Press 1 to approve press 2 to reject press 3 to skip and press 4 to exit");
+                        while (x == '5')
+                        {
+                            x = Console.ReadKey().KeyChar;
+                            if (x == '1')
+                            {
+                                q.StatusId = 1;
 
+                            }
+                            else if (x == '2')
+                                q.StatusId = 3;
+                            else if (x == '3')
+                                q.StatusId = 2;
+                            else if (x == '4')
+                            {
+                                context.SaveChanges();
+                            }
 
-        }
+                        }
+                    }
+
+                }
+                context.SaveChanges();
+                Console.WriteLine("hello", 80);
+                Console.WriteLine();
+                Console.WriteLine("Press any key to continue");
+                Console.ReadKey();
+            }
+        
+
+    }
         //איתמר
         public void ShowGame()
         {
