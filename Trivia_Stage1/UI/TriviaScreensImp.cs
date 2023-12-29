@@ -24,8 +24,8 @@ namespace Trivia_Stage1.UI
         //Implememnt interface here
         public bool ShowLogin()//Itamar
         {
-            
-            return true;
+
+
             loggedPlayer = null;
             bool loggedIn = false;
             while (!loggedIn)
@@ -77,6 +77,8 @@ namespace Trivia_Stage1.UI
             Console.WriteLine("Press any key");
             Console.ReadKey(true);
             return loggedIn;
+
+
         }
         public bool ShowSignUp()//Ran
         {
@@ -220,91 +222,45 @@ namespace Trivia_Stage1.UI
 
         public void ShowPendingQuestions()//Ben
         {
-
-
-
-            if (loggedPlayer != null && (loggedPlayer.RankId == 1 || loggedPlayer.RankId == 2))
+            if (this.loggedPlayer.RankId == 1 || this.loggedPlayer.RankId == 2)
             {
-                foreach (Question q in context.Questions)
+                Console.WriteLine("Pending question");
+                char c = '9';
+                foreach(Question q in context.Questions)
                 {
-                    char x = '5';
-                    if (q.StatusId == 2)
+                    if (q.StatusId == 1)
                     {
-                        ClearScreenAndSetTitle("Pending Questions    ");
-                        Console.WriteLine($"Question: {q.Question1}");
-                        Console.WriteLine($"Correct answer {q.RightA}");
-                        Console.WriteLine($"Wrong answer #1 {q.WrongA1}");
-                        Console.WriteLine($"Wrong answer #2 {q.WrongA2}");
-                        Console.WriteLine($"Wrong answer #3 {q.WrongA3}");
-                        Console.WriteLine("Press 1 to approve press 2 to reject press 3 to skip and press 4 to exit");
-                        while (x == '5')
+                        Console.WriteLine(q.Question1);
+                        Console.WriteLine(q.RightA);
+                        Console.WriteLine(q.WrongA1);
+                        Console.WriteLine(q.WrongA2);
+                        Console.WriteLine(q.WrongA3);
+                        Console.WriteLine("Press 1 to accept press 2 to reject");
+                        while (c == 9)
                         {
-                            x = Console.ReadKey().KeyChar;
-                            if (x == '1')
+                            c=Console.ReadKey().KeyChar;
+                            if(c == 1)
                             {
-                                q.StatusId = 1;
-
-                            }
-                            else if (x == '2')
-                                q.StatusId = 3;
-                            else if (x == '3')
                                 q.StatusId = 2;
-                            else if (x == '4')
-                            {
-                                context.SaveChanges();
                             }
-
+                            else if(c == 2)
+                            {
+                                q.StatusId= 3;
+                            }
+                            else { c = '5'; }
                         }
                     }
-
                 }
-                    context.SaveChanges();
+                
             }
-            else
+            else 
             {
-                Console.WriteLine("Hello");
-                foreach (Question q in context.Questions)
-                {
-                    char x = '5';
-                    if (q.StatusId == 2)
-                    {
-                        ClearScreenAndSetTitle("Pending Questions    ");
-                        Console.WriteLine($"Question: {q.Question1}");
-                        Console.WriteLine($"Correct answer {q.RightA}");
-                        Console.WriteLine($"Wrong answer #1 {q.WrongA1}");
-                        Console.WriteLine($"Wrong answer #2 {q.WrongA2}");
-                        Console.WriteLine($"Wrong answer #3 {q.WrongA3}");
-                        Console.WriteLine("Press 1 to approve press 2 to reject press 3 to skip and press 4 to exit");
-                        while (x == '5')
-                        {
-                            x = Console.ReadKey().KeyChar;
-                            if (x == '1')
-                            {
-                                q.StatusId = 1;
-
-                            }
-                            else if (x == '2')
-                                q.StatusId = 3;
-                            else if (x == '3')
-                                q.StatusId = 2;
-                            else if (x == '4')
-                            {
-                                context.SaveChanges();
-                            }
-
-                        }
-                    }
-
-                }
-                context.SaveChanges();
-                Console.WriteLine("hello", 80);
-                Console.WriteLine();
-                Console.WriteLine("Press any key to continue");
-                Console.ReadKey();
+                Console.WriteLine("You do not have accses to this page",80);
             }
-        
+                context.SaveChanges() ;
+            
 
-    }
+        }
         //איתמר
         public void ShowGame()
         {
