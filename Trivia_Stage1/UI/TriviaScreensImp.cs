@@ -213,6 +213,7 @@ namespace Trivia_Stage1.UI
             }
             else
             {
+                Console.WriteLine("You dont have premission");
                 Console.Clear();
                 context.SaveChanges();
 
