@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Trivia_Stage1.Models;
+using Trivia_Stage1.modelsBL;
 
 namespace Trivia_Stage1.UI
 {
@@ -25,10 +26,9 @@ namespace Trivia_Stage1.UI
         public bool ShowLogin()//Itamar
         {
 
-
             loggedPlayer = null;
-            bool loggedIn = false;
-            while (!loggedIn)
+
+            while (true)
             {
                 ClearScreenAndSetTitle("Login:\n");
                 string mail;
@@ -40,50 +40,49 @@ namespace Trivia_Stage1.UI
                     Console.WriteLine("Please email enter again:");
                     mail = Console.ReadLine();
                 }
+                Console.WriteLine("Password:");
+                password = Console.ReadLine();
+                while (password == null)
+                {
+                    Console.WriteLine("Please password enter again:");
+                    password = Console.ReadLine();
+                }
+
                 try
                 {
-                    if (context.DoesMailExistsInDb(mail))
+                    loggedPlayer = context.Login(mail, password);
+                    if (loggedPlayer == null)
                     {
-                        Console.WriteLine("Password:");
-                        password = Console.ReadLine();
-                        while (password == null)
-                        {
-                            Console.WriteLine("Please password enter again:");
-                            password = Console.ReadLine();
-                        }
-                        loggedPlayer = context.GetPlayerByMail(mail);
-                        if (loggedPlayer != null)
-                        {
-                            if (loggedPlayer.Password == password)
-                            {
-                                Console.WriteLine("Logged in successfully!");
-                                loggedIn = true;
-                            }
-                            else
-                                Console.WriteLine("Wrong email or password. Please try again");
-                        }
+                        throw new Exception("Sorry, cannot login");
                     }
-                    else
-                        Console.WriteLine("Email doesn't exists, please try again");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Sorry, there is a problem. Press any key to return to menu-");
+                    Console.WriteLine($"{ex.Message}. Press any key to return to menu-");
                     Console.ReadKey(true);
                     return false;
                 }
-
             }
-            Console.WriteLine("Press any key");
+            Console.WriteLine("Login successfully! Press any key");
             Console.ReadKey(true);
-            return loggedIn;
+            return true;
 
 
         }
+        public Player SignUp(string email, string password, string name)
+        {
+            Player newPlayer = new Player();
+
+            newPlayer.Name = name;
+            newPlayer.Password = password;
+            newPlayer.Rank = new Rank();
+            newPlayer.Rank.RankName = "Rookie";
+            this.Players.Add(newPlayer);
+            this.SaveChanges();
+            return newPlayer;
+        }
         public bool ShowSignUp()//Ran
         {
-            bool signUpStatus = false;
-
             //Logout user if anyone is logged in!
             //A reference to the logged in user should be stored as a member variable
             //in this class! Example:
@@ -91,77 +90,74 @@ namespace Trivia_Stage1.UI
 
             //Loop through inputs until a user/player is created or 
             //user choose to go back to menu
-            char c = ' ';
-            while (c.ToString().ToUpper() != "B")
+
+            //Clear screen
+            ClearScreenAndSetTitle("Signup");
+
+            Console.Write("Please Type your email: ");
+            string email = Console.ReadLine();
+            bool isEmailOkay = false;
+            while (!isEmailOkay)
             {
-                //Clear screen
-                ClearScreenAndSetTitle("Signup");
-                loggedPlayer = new Player();
-
-                if (!UpdateEmail("Please Type your email: ", "Bad Email Format! Please try again:"))
-                    return false;
-
-                Console.Write("Please Type your password: ");
-                string password = Console.ReadLine();
-                while (!IsPasswordValid(password))
+                if (email.ToUpper() == "B") { return false; }
+                //if the mail formate is good check if the player is already created
+                //if the mail formate is not good so get the mail again
+                if (IsEmailValid(email))
                 {
-                    if (password.ToUpper() == "B") { return false; }
-                    password = ErrorMessage("Password must be at least 3 characters! Please try again: ");
+                    if (!this.context.DoesMailExistsInDb(email))
+                        isEmailOkay = true;
+                    else
+                        email = ErrorMessage("This mail already used! Please try again:");
                 }
-                loggedPlayer.Password = password;
-
-                Console.Write("Please Type your Name: ");
-                string name = Console.ReadLine();
-                while (!IsNameValid(name))
+                else
                 {
-                    if (name.ToUpper() == "B") { return false; }
-                    name = ErrorMessage("name must be at least 3 characters! Please try again: ");
+                    email = ErrorMessage("Bad Email Format! Please try again:");
                 }
-                loggedPlayer.Name = name;
-                loggedPlayer.Rank = new Rank();
-                loggedPlayer.Rank.RankName = "Rookie";
-
-                Console.ForegroundColor = ConsoleColor.DarkBlue;
-                Console.WriteLine("Connecting to Server...");
-                Console.ResetColor();
-
-                //Create instance of Business Logic and call the signup method
-                // *For example:
-                //try
-                //{
-                //    TriviaDBContext db = new TriviaDBContext();
-                //    this.currentyPLayer = db.SignUp(email, password, name);
-                //}
-                //catch (Exception ex)
-                //{
-                //    Console.ForegroundColor = ConsoleColor.Red;
-                //    Console.WriteLine("Failed to signup! Email may already exist in DB!");
-                //    Console.ResetColor();
-                //}
-                try
-                {
-                    context.Players.Add(loggedPlayer);
-                    //context.SaveChanges();
-                    Console.WriteLine("Sign Up succeeded");
-                    signUpStatus = true;
-                }
-                catch (Exception ex)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Sign Up failed");
-                    Console.ResetColor();
-                    signUpStatus = false;
-                }
-
-                //Provide a proper message for example:
-                Console.WriteLine("Press (B)ack to go back or any other key to signup again...");
-                //Get another input from user
-                c = Console.ReadKey(true).KeyChar;
             }
 
+            Console.Write("Please Type your password: ");
+            string password = Console.ReadLine();
+            while (!IsPasswordValid(password))
+            {
+                if (password.ToUpper() == "B") { return false; }
+                password = ErrorMessage("Password must be at least 3 characters! Please try again: ");
+            }
 
-            //return true if signup suceeded!
-            return signUpStatus;
+            Console.Write("Please Type your Name: ");
+            string name = Console.ReadLine();
+            while (!IsNameValid(name))
+            {
+                if (name.ToUpper() == "B") { return false; }
+                name = ErrorMessage("name must be at least 3 characters! Please try again: ");
+            }
+
+            //Create instance of Business Logic and call the signup method
+            // *For example:
+            //try
+            //{
+            //    TriviaDBContext db = new TriviaDBContext();
+            //    this.currentyPLayer = db.SignUp(email, password, name);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.ForegroundColor = ConsoleColor.Red;
+            //    Console.WriteLine("Failed to signup! Email may already exist in DB!");
+            //    Console.ResetColor();
+            //}
+
+            try
+            {
+                this.loggedPlayer = this.context.SignUp(email, password, name);
+                Console.WriteLine("Sign Up succeeded");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Sign Up failed");
+                Console.ResetColor();
+                return false;
+            }
 
         }
         //Ben
