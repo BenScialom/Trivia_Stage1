@@ -69,18 +69,7 @@ namespace Trivia_Stage1.UI
 
 
         }
-        public Player SignUp(string email, string password, string name)
-        {
-            Player newPlayer = new Player();
-
-            newPlayer.Name = name;
-            newPlayer.Password = password;
-            newPlayer.Rank = new Rank();
-            newPlayer.Rank.RankName = "Rookie";
-            this.Players.Add(newPlayer);
-            this.SaveChanges();
-            return newPlayer;
-        }
+        
         public bool ShowSignUp()//Ran
         {
             //Logout user if anyone is logged in!

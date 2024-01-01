@@ -20,5 +20,17 @@ namespace Trivia_Stage1.modelsBL
             int questionNum = random.Next(1, Questions.Count() + 1);
             return this.Questions.Where(question => question.QuestionId == questionNum && question.StatusId == 0).First();
         }
+        public Player SignUp(string email, string password, string name)
+        {
+            Player newPlayer = new Player();
+
+            newPlayer.Name = name;
+            newPlayer.Password = password;
+            newPlayer.Rank = new Rank();
+            newPlayer.Rank.RankName = "Rookie";
+            this.Players.Add(newPlayer);
+            this.SaveChanges();
+            return newPlayer;
+        }
     }
 }
